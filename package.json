@@ -1,7 +1,7 @@
 {
     "name": "Itoria-Launcher",
     "preductname": "Itoria Launcher",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "description": "Launcher Minecraft pour le serveur Itoria",
     "main": "src/app.js",
     "author": {
@@ -9,7 +9,7 @@
         "email": "contact@luuxis.fr",
         "url": "https://github.com/luuxis"
     },
-    "url": "https://magictiss.com/launcherFiles",
+    "url": "https://launcher.magictiss.com",
     "scripts": {
         "start": "cross-env-shell NODE_ENV=dev electron .",
         "dev": "cross-env-shell DEV_TOOL=open nodemon --exec npm start",
@@ -30,7 +30,7 @@
     },
     "devDependencies": {
         "cross-env": "^7.0.3",
-        "electron": "^30.0.9",
+        "electron": "^39.2.7",
         "electron-builder": "^24.13.3",
         "javascript-obfuscator": "^4.1.0",
         "jimp": "^0.22.12",
