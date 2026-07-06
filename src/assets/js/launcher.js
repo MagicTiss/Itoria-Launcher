@@ -90,14 +90,16 @@ class Launcher {
         let configClient = await this.db.readData('configClient')
 
         if (!configClient) {
+            let totalMem = Math.trunc(os.totalmem() / 1073741824);
+            let defaultMaxRam = Math.max(Math.trunc(totalMem * 0.75), 2);
             await this.db.createData('configClient', {
                 account_selected: null,
                 instance_select: null,
                 java_config: {
                     java_path: null,
                     java_memory: {
-                        min: 2,
-                        max: 4
+                        min: Math.min(2, defaultMaxRam),
+                        max: defaultMaxRam
                     }
                 },
                 game_config: {

@@ -3,6 +3,39 @@
     --transition: all 0.5s cubic-bezier(1, 0.46, 0, 1.29);
     --dark-color: #292929;
     --light-color: rgb(245, 245, 245);
+    /* design v2 */
+    --v2-accent: #3ddc84;
+    --v2-accent-contrast: #0c2417;
+    --v2-danger: #ff5f57;
+    --v2-font: 'Baloo 2', 'Poppins', sans-serif;
+}
+
+.dark {
+    --v2-panel: #17151b;
+    --v2-sidebar: #141218;
+    --v2-card: rgba(24, 22, 28, .88);
+    --v2-input: #0f0e12;
+    --v2-line: rgba(255, 255, 255, .07);
+    --v2-soft: rgba(255, 255, 255, .07);
+    --v2-soft-hover: rgba(255, 255, 255, .15);
+    --v2-text: #ffffff;
+    --v2-text-soft: rgba(255, 255, 255, .75);
+    --v2-text-dim: rgba(255, 255, 255, .5);
+    --v2-scrim: rgba(18, 15, 20, .35);
+}
+
+.light {
+    --v2-panel: #f2f0f5;
+    --v2-sidebar: #e9e6ee;
+    --v2-card: rgba(255, 255, 255, .88);
+    --v2-input: #e4e1e9;
+    --v2-line: rgba(0, 0, 0, .08);
+    --v2-soft: rgba(0, 0, 0, .06);
+    --v2-soft-hover: rgba(0, 0, 0, .12);
+    --v2-text: #1a1721;
+    --v2-text-soft: rgba(26, 23, 33, .78);
+    --v2-text-dim: rgba(26, 23, 33, .5);
+    --v2-scrim: rgba(245, 243, 248, .35);
 }
 
 .dark {

@@ -1,57 +1,78 @@
 <div class="container">
-    <div class="status-server">
-        <img class="server-status-icon" src="assets/images/icon/icon.png">
-        <div class="server-status-infos">
-            <div class="server-status-name">Minecraft</div>
-            <div class="server-status-text">operationeel - 0 ms</div>
+    <div class="home-left">
+        <div class="home-hero">
+            <div class="instance-popup">
+                <div class="instances-tab">
+                    <div class="instances-List"></div>
+                </div>
+            </div>
+            <div class="home-title">Itoria</div>
+
+            <div class="status-server">
+                <div class="server-status-infos">
+                    <span class="server-status-name">Itoria</span>
+                    <span class="server-status-text">En ligne - 0 ms</span>
+                </div>
+                <div class="status-player-count">
+                    <span class="player-count">0</span>
+                    <span class="player-count-label">en jeu</span>
+                </div>
+            </div>
+
+            <div class="play-elements">
+                <div class="play-instance">
+                    <button class="play-btn">Jouer</button>
+                </div>
+                <div class="info-starting-game">
+                    <div class="info-starting-game-text">Connexion...</div>
+                    <progress value="0" max="0" class="progress-bar"></progress>
+                </div>
+            </div>
         </div>
-        <div class="status-player-count">
-            <div class="player-count">0</div>
+
+        <div class="home-footer">
+            <div class="player-options">
+                <div class="player-head"></div>
+                <div class="player-infos">
+                    <div class="player-name"></div>
+                    <div class="player-account-type"></div>
+                </div>
+            </div>
+            <div class="settings-btn icon-settings"></div>
         </div>
     </div>
 
-    <div class="home-bottom">
-        <div class="new-tab">
+    <div class="home-right">
+        <div class="news-header-row">
             <div class="titre-tab-new">Actualités</div>
-            <div class="news-list content-scroll"></div>
-        </div>
-        <div class="social-tab">
-            <div class="social-list content-scroll">
-                <div data-url="https://discord.gg/pngTpWrAC9" class="social-block">
+            <div class="social-list">
+                <div data-url="https://discord.gg/pngTpWrAC9" title="Discord" class="social-block">
                     <div class="icon-discord icon-social"></div>
                 </div>
-
-                <div data-url="https://www.youtube.com/c/MagicTiss" class="social-block">
+                <div data-url="https://www.youtube.com/c/MagicTiss" title="YouTube" class="social-block">
                     <div class="icon-youtube icon-social"></div>
+                </div>
+                <div data-url="https://www.tiktok.com/@magictiss" title="TikTok" class="social-block">
+                    <div class="icon-tiktok icon-social"></div>
+                </div>
+                <div data-url="https://www.twitch.tv/magictiss" title="Twitch" class="social-block">
+                    <div class="icon-twitch icon-social"></div>
+                </div>
+                <div data-url="https://magictiss.com" title="Site web" class="social-block">
+                    <div class="icon-web icon-social"></div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="sidebar">
-        <div class="player-options">
-            <div class="player-head"></div>
-        </div>
-
-        <div class="play-elements">
-            <div class="play-instance">
-                <button class="play-btn">Jouer</button>
-                <div class="instance-select icon-arrow"></div>
+        <div class="news-list content-scroll"></div>
+        <div class="radio-player">
+            <img class="radio-art" src="assets/images/icon/icon.png" alt="">
+            <div class="radio-infos">
+                <div class="radio-title">Morioh Radio</div>
+                <div class="radio-artist">Connexion à la radio...</div>
             </div>
-            <div class="info-starting-game">
-                <div class="info-starting-game-text">Connexion...</div>
-                <progress value="0" max="0" class="progress-bar"></progress>
-            </div>
-        </div>
-
-        <div class="settings-btn icon-settings"></div>
-    </div>
-
-    <div class="instance-popup">
-        <div class="instances-tab">
-            <div class="close-popup icon-close"></div>
-            <p>Choisissez votre instance...</p>
-            <div class="instances-List"></div>
+            <input type="range" class="radio-volume" min="0" max="100" value="50">
+            <div class="radio-play">▶</div>
         </div>
     </div>
+
 </div>

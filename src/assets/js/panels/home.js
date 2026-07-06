@@ -15,7 +15,91 @@ class Home {
         this.news()
         this.socialLick()
         this.instancesSelect()
+        this.playerInfos()
+        this.radioPlayer()
         document.querySelector('.settings-btn').addEventListener('click', e => changePanel('settings'))
+    }
+
+    radioPlayer() {
+        const streamURL = 'https://moriohradio.magictiss.com/listen/morioh_radio/moriohradio.mp3'
+        const nowPlayingURL = 'https://moriohradio.magictiss.com/api/nowplaying/morioh_radio'
+
+        let playBTN = document.querySelector('.radio-play')
+        let artIMG = document.querySelector('.radio-art')
+        let titleTXT = document.querySelector('.radio-title')
+        let artistTXT = document.querySelector('.radio-artist')
+        let volumeSlider = document.querySelector('.radio-volume')
+
+        this.radioAudio = new Audio()
+        this.radioAudio.volume = volumeSlider.value / 100
+
+        playBTN.addEventListener('click', () => {
+            if (this.radioAudio.paused) {
+                // recharger le flux pour reprendre au direct
+                this.radioAudio.src = streamURL
+                this.radioAudio.play().catch(() => { })
+                playBTN.textContent = '❚❚'
+                playBTN.classList.add('radio-playing')
+            } else {
+                this.radioAudio.pause()
+                this.radioAudio.removeAttribute('src')
+                playBTN.textContent = '▶'
+                playBTN.classList.remove('radio-playing')
+            }
+        })
+
+        volumeSlider.addEventListener('input', () => this.radioAudio.volume = volumeSlider.value / 100)
+
+        let updateNowPlaying = async () => {
+            try {
+                let res = await fetch(nowPlayingURL).then(res => res.json())
+                let song = res?.now_playing?.song
+                if (!song) return
+                titleTXT.textContent = song.title || 'Titre inconnu'
+                artistTXT.textContent = song.artist || 'Morioh Radio'
+                if (song.art) artIMG.src = song.art
+            } catch {
+                artistTXT.textContent = 'Radio indisponible'
+            }
+        }
+        updateNowPlaying()
+        setInterval(updateNowPlaying, 15000)
+    }
+
+    getInstanceIcon(instanceName) {
+        let icons = {
+            'Itoria': 'assets/images/icon/itoria-instance.png',
+            'Survie Cobblemon': 'assets/images/icon/cobblemon.png'
+        }
+        return icons[instanceName] || 'assets/images/icon/unknown.png'
+    }
+
+    updateInstanceBranding(instanceName) {
+        let logo = document.querySelector('.home-logo')
+        let title = document.querySelector('.home-title')
+        if (logo) logo.src = instanceName ? this.getInstanceIcon(instanceName) : 'assets/images/icon/icon.png'
+        if (title) title.textContent = instanceName || 'Itoria'
+    }
+
+    centerInstanceCarousel(animate = true) {
+        let track = document.querySelector('.instances-List')
+        let viewport = document.querySelector('.instances-tab')
+        let items = [...track.querySelectorAll('.instance-elements')]
+        let idx = items.findIndex(item => item.classList.contains('active-instance'))
+        if (idx < 0) idx = 0
+        // largeur d'un emplacement : 84px + 12px de marge
+        let offset = viewport.clientWidth / 2 - (idx * 124 + 55)
+        track.style.transition = animate ? 'transform .4s cubic-bezier(.2, .8, .3, 1)' : 'none'
+        track.style.transform = `translateX(${offset}px)`
+    }
+
+    async playerInfos() {
+        let configClient = await this.db.readData('configClient')
+        let account = await this.db.readData('accounts', configClient?.account_selected)
+        if (!account) return
+        document.querySelector('.player-name').textContent = account.name
+        let accountType = account.meta?.type === 'Xbox' ? 'Compte Microsoft' : account.meta?.online === false ? 'Compte local' : 'Compte Minecraft'
+        document.querySelector('.player-account-type').textContent = accountType
     }
 
     async news() {
@@ -111,12 +195,6 @@ class Home {
         let instanceBTN = document.querySelector('.play-instance')
         let instancePopup = document.querySelector('.instance-popup')
         let instancesListPopup = document.querySelector('.instances-List')
-        let instanceCloseBTN = document.querySelector('.close-popup')
-
-        if (instancesList.length === 1) {
-            document.querySelector('.instance-select').style.display = 'none'
-            instanceBTN.style.paddingRight = '0'
-        }
 
         if (!instanceSelect) {
             let newInstanceSelect = instancesList.find(i => i.whitelistActive == false)
@@ -142,61 +220,43 @@ class Home {
             } else console.log(`Initializing instance ${instance.name}...`)
             if (instance.name == instanceSelect) setStatus(instance.status)
         }
+        this.updateInstanceBranding(instanceSelect)
+
+        // construire le carrousel, qui sert aussi de logo principal
+        instancesListPopup.innerHTML = ''
+        for (let instance of instancesList) {
+            if (instance.whitelistActive && !instance.whitelist.find(whitelist => whitelist == auth?.name)) continue
+            let active = instance.name == instanceSelect ? ' active-instance' : ''
+            instancesListPopup.innerHTML += `
+                <div id="${instance.name}" title="${instance.name}" class="instance-elements${active}">
+                    <img class="instance-icon" src="${this.getInstanceIcon(instance.name)}">
+                </div>`
+        }
+        this.centerInstanceCarousel(false)
 
         instancePopup.addEventListener('click', async e => {
             let configClient = await this.db.readData('configClient')
 
             if (e.target.classList.contains('instance-elements')) {
                 let newInstanceSelect = e.target.id
+                if (newInstanceSelect == configClient.instance_select) return
                 let activeInstanceSelect = document.querySelector('.active-instance')
 
                 if (activeInstanceSelect) activeInstanceSelect.classList.toggle('active-instance');
                 e.target.classList.add('active-instance');
+                this.centerInstanceCarousel()
 
                 configClient.instance_select = newInstanceSelect
                 await this.db.updateData('configClient', configClient)
                 instanceSelect = instancesList.filter(i => i.name == newInstanceSelect)
-                instancePopup.style.display = 'none'
                 let instance = await config.getInstanceList()
                 let options = instance.find(i => i.name == configClient.instance_select)
                 await setStatus(options.status)
+                this.updateInstanceBranding(configClient.instance_select)
             }
         })
 
-        instanceBTN.addEventListener('click', async e => {
-            let configClient = await this.db.readData('configClient')
-            let instanceSelect = configClient.instance_select
-            let auth = await this.db.readData('accounts', configClient.account_selected)
-
-            if (e.target.classList.contains('instance-select')) {
-                instancesListPopup.innerHTML = ''
-                for (let instance of instancesList) {
-                    if (instance.whitelistActive) {
-                        instance.whitelist.map(whitelist => {
-                            if (whitelist == auth?.name) {
-                                if (instance.name == instanceSelect) {
-                                    instancesListPopup.innerHTML += `<div id="${instance.name}" class="instance-elements active-instance">${instance.name}</div>`
-                                } else {
-                                    instancesListPopup.innerHTML += `<div id="${instance.name}" class="instance-elements">${instance.name}</div>`
-                                }
-                            }
-                        })
-                    } else {
-                        if (instance.name == instanceSelect) {
-                            instancesListPopup.innerHTML += `<div id="${instance.name}" class="instance-elements active-instance">${instance.name}</div>`
-                        } else {
-                            instancesListPopup.innerHTML += `<div id="${instance.name}" class="instance-elements">${instance.name}</div>`
-                        }
-                    }
-                }
-
-                instancePopup.style.display = 'flex'
-            }
-
-            if (!e.target.classList.contains('instance-select')) this.startGame()
-        })
-
-        instanceCloseBTN.addEventListener('click', () => instancePopup.style.display = 'none')
+        instanceBTN.addEventListener('click', () => this.startGame())
     }
 
     async startGame() {
@@ -253,6 +313,7 @@ class Home {
         launch.Launch(opt);
 
         playInstanceBTN.style.display = "none"
+        document.querySelector('.instance-popup').style.pointerEvents = "none"
         infoStartingBOX.style.display = "block"
         progressBar.style.display = "";
         ipcRenderer.send('main-window-progress-load')
@@ -295,7 +356,8 @@ class Home {
 
         launch.on('data', (e) => {
             progressBar.style.display = "none"
-            if (configClient.launcher_config.closeLauncher == 'close-launcher') {
+            let radioPlaying = this.radioAudio && !this.radioAudio.paused
+            if (configClient.launcher_config.closeLauncher == 'close-launcher' && !radioPlaying) {
                 ipcRenderer.send("main-window-hide")
             };
             new logger('Minecraft', '#36b030');
@@ -311,6 +373,7 @@ class Home {
             ipcRenderer.send('main-window-progress-reset')
             infoStartingBOX.style.display = "none"
             playInstanceBTN.style.display = "flex"
+            document.querySelector('.instance-popup').style.pointerEvents = ""
             infoStarting.innerHTML = `Vérification`
             new logger(pkg.name, '#7289da');
             console.log('Close');
@@ -332,6 +395,7 @@ class Home {
             ipcRenderer.send('main-window-progress-reset')
             infoStartingBOX.style.display = "none"
             playInstanceBTN.style.display = "flex"
+            document.querySelector('.instance-popup').style.pointerEvents = ""
             infoStarting.innerHTML = `Vérification`
             new logger(pkg.name, '#7289da');
             console.log(err);
